@@ -64,6 +64,14 @@ fn payload_frame_num_from(n: usize) -> Result<NBytes<U3>> {
     Ok(NBytes::from(*g))
 }
 
+#[cfg(target_pointer_width = "32")]
+fn payload_frame_num_to(v: &NBytes<U3>) -> usize {
+    let mut u = [0_u8; 4];
+    u[1..].copy_from_slice(v.as_ref());
+    usize::from_be_bytes(u)
+}
+
+#[cfg(target_pointer_width = "64")]
 fn payload_frame_num_to(v: &NBytes<U3>) -> usize {
     let mut u = [0_u8; 8];
     u[5..].copy_from_slice(v.as_ref());

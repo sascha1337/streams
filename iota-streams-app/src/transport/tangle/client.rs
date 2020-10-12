@@ -135,7 +135,7 @@ fn make_bundle(
     address: &[u8],
     tag: &[u8],
     mut body: &[u8],
-    timestamp: u64,
+    timestamp: usize,
     trunk: Hash,
     branch: Hash,
 ) -> Result<Bundle> {
@@ -143,7 +143,7 @@ fn make_bundle(
         .map_err(|e| anyhow!("Bad tx address: {:?}.", e))?;
     let tx_tag = Tag::try_from_inner(pad_tritbuf(TAG_TRIT_LEN, bytes_to_tritbuf(tag)))
         .map_err(|e| anyhow!("Bad tx tag: {:?}.", e))?;
-    let tx_timestamp = Timestamp::try_from_inner(timestamp).map_err(|e| anyhow!("Bad tx timestamp: {:?}.", e))?;
+    let tx_timestamp = Timestamp::try_from_inner(timestamp.try_into().unwrap()).map_err(|e| anyhow!("Bad tx timestamp: {:?}.", e))?;
 
     let mut bundle_builder = OutgoingBundleBuilder::default();
     while !body.is_empty() {
@@ -270,7 +270,7 @@ pub fn msg_from_bundle<F>(bundle: &Bundle) -> TangleMessage<F> {
 
     let binary = BinaryMessage::new(TangleAddress { appinst, msgid }, body.into());
     // let timestamp: u64 = *(tx.timestamp() as *const iota::bundle::Timestamp) as *const u64;
-    let timestamp: u64 = unsafe { core::mem::transmute(tx.timestamp()) };
+    let timestamp: usize = unsafe { core::mem::transmute(tx.timestamp()) };
 
     TangleMessage { binary, timestamp }
 }
@@ -284,7 +284,7 @@ pub fn msg_from_bundle<F>(bundle: &Bundle) -> TangleMessage<F> {
 /// bundles have distinct nonces and/or timestamps.
 pub fn msg_to_bundle<F>(
     msg: &BinaryMessage<F, TangleAddress>,
-    timestamp: u64,
+    timestamp: usize,
     trunk: Hash,
     branch: Hash,
 ) -> Result<Bundle> {

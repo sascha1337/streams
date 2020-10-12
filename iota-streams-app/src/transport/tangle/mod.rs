@@ -46,7 +46,7 @@ pub struct TangleMessage<F> {
 
     /// Timestamp is not an intrinsic part of Streams message; it's a part of the bundle.
     /// Timestamp is checked with Kerl as part of bundle essense trits.
-    pub timestamp: u64,
+    pub timestamp: usize,
 }
 
 impl<F> LinkedMessage<TangleAddress> for TangleMessage<F> {
@@ -62,7 +62,7 @@ impl<F> TangleMessage<F> {
     pub fn new(msg: BinaryMessage<F, TangleAddress>) -> Self {
         Self {
             binary: msg,
-            timestamp: chrono::Utc::now().timestamp_millis() as u64,
+            timestamp: chrono::Utc::now().timestamp_millis() as usize,
         }
     }
 }
@@ -80,7 +80,7 @@ impl<F> TangleMessage<F> {
 
 impl<F> TangleMessage<F> {
     /// Create TangleMessage from BinaryMessage and an explicit timestamp.
-    pub fn with_timestamp(msg: BinaryMessage<F, TangleAddress>, timestamp: u64) -> Self {
+    pub fn with_timestamp(msg: BinaryMessage<F, TangleAddress>, timestamp: usize) -> Self {
         Self { binary: msg, timestamp }
     }
 }

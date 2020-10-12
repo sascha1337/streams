@@ -192,9 +192,8 @@ where
             let mut nbytes = NBytes::<U3>::default();
             let v = nbytes.as_mut();
             let x = self.payload_frame_count.to_be_bytes();
-            v[0] = x[5] & 0x3f;
-            v[1] = x[6];
-            v[2] = x[7];
+            
+            destruct_usize(v, x);
             nbytes
         };
 
@@ -253,15 +252,43 @@ where
         {
             let v = payload_frame_count.as_ref();
             ensure!(0 == v[0] & 0xc0, "Bad reserved bits");
-            let mut x = [0_u8; 8];
-            x[5] = v[0];
-            x[6] = v[1];
-            x[7] = v[2];
-            self.payload_frame_count = usize::from_be_bytes(x);
+            self.payload_frame_count = construct_usize(v);
         }
 
         ctx.absorb(External(Fallback(&self.link)))?.skip(&mut self.seq_num)?;
 
         Ok(ctx)
     }
+}
+
+#[cfg(target_pointer_width = "32")]
+fn construct_usize(v: &[u8]) -> usize{
+    let mut x = [0_u8; 4];
+    x[1] = v[0];
+    x[2] = v[1];
+    x[3] = v[2];
+    usize::from_be_bytes(x)
+}
+
+#[cfg(target_pointer_width = "64")]
+fn construct_usize(v: &[u8]) -> usize{
+    let mut x = [0_u8; 8];
+    x[5] = v[0];
+    x[6] = v[1];
+    x[7] = v[2];
+    usize::from_be_bytes(x)
+}
+
+#[cfg(target_pointer_width = "32")]
+fn destruct_usize(v: &[u8], x: u8[8]){
+    v[0] = x[1] & 0x3f;
+    v[1] = x[2];
+    v[2] = x[3];
+}
+
+#[cfg(target_pointer_width = "64")]
+fn destruct_usize(v: &[u8],  x: u8[8]){
+    v[0] = x[5] & 0x3f;
+    v[1] = x[6];
+    v[2] = x[7];
 }
