@@ -1,0 +1,18 @@
+[package]
+name = "streams-neon"
+version = "0.1.0"
+authors = ["Brord van Wierst <brord@iota.org>"]
+license = "MIT"
+build = "build.rs"
+edition = "2018"
+exclude = ["artifacts.json", "index.node"]
+
+[lib]
+name = "streams_neon"
+crate-type = ["cdylib"]
+
+[build-dependencies]
+neon-build = "0.5.3"
+
+[dependencies]
+neon = "0.5.3"
