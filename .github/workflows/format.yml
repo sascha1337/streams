@@ -6,6 +6,7 @@ on:
       - master
       - develop
       - chrysalis-2
+      - feat/actions-test-all
   pull_request:
     branches:
       - master
@@ -29,6 +30,10 @@ jobs:
             "iota-streams-ddml",
             "iota-streams-app",
             "iota-streams-app-channels",
+            "iota-streams-app-channels-example",
+            "examples",
+            "bindings/c",
+            "bindings/wasm",
           ]
 
     steps:
